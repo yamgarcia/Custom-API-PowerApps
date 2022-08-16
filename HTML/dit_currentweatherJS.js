@@ -1,13 +1,28 @@
 var Sdk = window.Sdk || {};
 
 (function () {
-  this.retrieveBuildSiteCity = async function () {
-    // var formContext = executionContext.getFormContext();
+  this.retrieveBuildSiteCity = async function (executionContext) {
     // var permitName = formContext.getAttribute("contoso_Permit").getValue();
     // formContext._data._entity._attributes._collection.contoso_permit._attributeName
-    // let inspectionId = formContext._entityReference.id.guid;
-    // let inspectionEntity = formContext._entityReference.etn;
+    var formContext = executionContext.getFormContext();
+    let inspectionId = formContext._entityReference.id.guid;
+    let inspectionEntity = formContext._entityReference.etn;
     //console.log([inspectionId, inspectionEntity]);
+    Xrm.WebApi.retrieveRecord(
+      inspectionEntity,
+      inspectionId,
+      "?$select=*&$expand=contoso_permit($select=contoso_BuildSite)"
+    ).then(function (result) {
+      console.log(
+        "Retrieved values: Name: " +
+          result.name +
+          ", Primary Contact ID: " +
+          result.primarycontactid.contactid +
+          ", Primary Contact Name: " +
+          result.primarycontactid.fullname
+      );
+    });
+    //------------------------------------------------executionContext
 
     var Xrm = window.parent.Xrm;
 
@@ -19,7 +34,6 @@ var Sdk = window.Sdk || {};
 
     let permit = Xrm.Page.getAttribute("contoso_permit").getValue();
     console.log(permit);
-    // Xrm.WebApi.retrieveRecord(inspectionEntity, inspectionId,"?$select=*&$expand=contoso_Permit($select=contoso_BuildSite)").then(function (result) {
 
     await Xrm.WebApi.retrieveRecord("contoso_permit", permit[0].id).then(
       function permitSuccess(result) {
